@@ -2,7 +2,7 @@
 import { renderToStaticMarkup } from 'react-dom/server.browser'
 import type { ReactNode } from 'react'
 import { GameProvider } from '../src/app/store'
-import { App } from '../src/App'
+import { Game } from '../src/Game'
 import { Home } from '../src/ui/screens/Home'
 import { Character } from '../src/ui/screens/Character'
 import { Codex } from '../src/ui/screens/Codex'
@@ -29,17 +29,16 @@ const seeded = {
   ],
 }
 
-const store = JSON.stringify(seeded)
-;(globalThis as { localStorage: { getItem: () => string | null } }).localStorage = {
-  getItem: () => store,
-  setItem: () => {},
-  removeItem: () => {},
-} as never
+// shim/taro.ts 从这里读存档 —— SaveRepository 现在走 Taro.getStorageSync，
+// 两端同一份代码，Node 里只需要一个内存 store。
+;(globalThis as { __FQ_STORE__?: Record<string, string> }).__FQ_STORE__ = {
+  'fitquest.save.v1': JSON.stringify(seeded),
+}
 
 const wrap = (node: ReactNode) => renderToStaticMarkup(<GameProvider>{node}</GameProvider>)
 
 const cases: [string, ReactNode][] = [
-  ['App', <App />],
+  ['Game', <Game />],
   ['Home', <Home exercise="squat" onPickExercise={() => {}} onStart={() => {}} />],
   ['Battle', <Battle exercise="squat" onFinish={() => {}} onAbort={() => {}} />],
   ['Victory', <Victory onBack={() => {}} />],

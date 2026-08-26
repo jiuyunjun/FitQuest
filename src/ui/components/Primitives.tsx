@@ -1,3 +1,4 @@
+import { View } from '@tarojs/components'
 import type { CSSProperties, ReactNode } from 'react'
 import { useState } from 'react'
 import { C, F } from '../tokens'
@@ -28,13 +29,13 @@ export function PixelButton({
   const offset = pressed && !disabled ? 5 : 0
 
   return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onClick}
-      onPointerDown={() => setPressed(true)}
-      onPointerUp={() => setPressed(false)}
-      onPointerLeave={() => setPressed(false)}
+    // 小程序没有 <button> 的按下态可用，按压位移自己管；
+    // Pointer Events 在小程序不存在，统一走 touch。
+    <View
+      onClick={disabled ? undefined : onClick}
+      onTouchStart={() => setPressed(true)}
+      onTouchEnd={() => setPressed(false)}
+      onTouchCancel={() => setPressed(false)}
       style={{
         font: `400 ${size}px/1.4 ${F.pixel}`,
         color: disabled ? C.dim : palette.color,
@@ -44,12 +45,16 @@ export function PixelButton({
         transform: `translate(${offset}px, ${offset}px)`,
         padding: '18px 22px',
         minHeight: 54,
-        cursor: disabled ? 'not-allowed' : 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        boxSizing: 'border-box',
         ...style,
       }}
     >
       {children}
-    </button>
+    </View>
   )
 }
 
@@ -63,7 +68,7 @@ export function Panel({
   style?: CSSProperties
 }) {
   return (
-    <div
+    <View
       style={{
         border: `3px solid ${accent ?? C.line}`,
         background: C.panel,
@@ -74,12 +79,12 @@ export function Panel({
       }}
     >
       {children}
-    </div>
+    </View>
   )
 }
 
 export function Label({ children, color = C.label }: { children: ReactNode; color?: string }) {
-  return <div style={{ font: `400 9px/1.4 ${F.pixel}`, color }}>{children}</div>
+  return <View style={{ font: `400 9px/1.4 ${F.pixel}`, color }}>{children}</View>
 }
 
 /** 分段进度条：3px 间隔的硬格子，不用平滑条。 */
@@ -101,9 +106,9 @@ export function SegmentedBar({
   const ratio = max > 0 ? Math.max(0, Math.min(1, value / max)) : 0
   const filled = Math.ceil(ratio * segments)
   return (
-    <div style={{ display: 'flex', gap: 3 }}>
+    <View style={{ display: 'flex', gap: 3 }}>
       {Array.from({ length: segments }, (_, i) => (
-        <div
+        <View
           key={i}
           style={{
             flex: 1,
@@ -113,7 +118,7 @@ export function SegmentedBar({
           }}
         />
       ))}
-    </div>
+    </View>
   )
 }
 
@@ -131,10 +136,10 @@ export function SolidBar({
 }) {
   const pct = max > 0 ? Math.max(0, Math.min(100, (value / max) * 100)) : 0
   return (
-    <div style={{ display: 'flex', gap: 2 }}>
-      <div style={{ flex: pct, height, background: color }} />
-      <div style={{ flex: 100 - pct, height, background: C.line }} />
-    </div>
+    <View style={{ display: 'flex', gap: 2 }}>
+      <View style={{ flex: pct, height, background: color }} />
+      <View style={{ flex: 100 - pct, height, background: C.line }} />
+    </View>
   )
 }
 
@@ -148,7 +153,7 @@ export function Row({
   accent?: string
 }) {
   return (
-    <div
+    <View
       style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -161,6 +166,6 @@ export function Row({
     >
       {left}
       {right}
-    </div>
+    </View>
   )
 }

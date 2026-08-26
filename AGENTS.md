@@ -113,6 +113,7 @@ jack  idle             -> reps 0
 ## 4. 分层：别越界
 
 ```
+platform/  → 唯一知道「现在跑在小程序还是 H5」的地方（env / font / screen）
 sensor/    → 拿原始 IMU，只有这一层知道 DeviceMotion / 微信 API 的存在
 signal/    → 滤波、基线、采样率、滑窗。纯函数，不认识游戏
 exercise/  → 状态机数次数 + 质量评分。不认识 Boss
@@ -130,15 +131,57 @@ app/       → 把它们粘起来（store + useTraining）
 - **Phase 2 接 ONNX 时，只应该新增 `ml/OnnxClassifier.ts` 并改 `app/useTraining.ts`。**
   如果你发现必须改 `game/` 才能接模型，说明分层被破坏了，停下来先修分层。
 - `signal/window.ts` 的 `SlidingWindow` 已按 100×6 预留，别改签名。
+- **平台差异只允许出现在 `platform/` 和 `sensor/` 里。**
+  别在组件里写 `process.env.TARO_ENV === 'weapp'` 分支 ——
+  要用平台能力就在 `platform/` 加一个两端都能调的函数。
+
+---
+
+## 4.1 双端：小程序 + H5 共用一套代码
+
+Taro 4 + React。`npm run build:weapp` 出小程序，`npm run build:h5` 出网页，
+`sensor/` 以下全部逻辑两端共享，一行都不分叉。
+
+写 UI 时的硬约束：
+
+- **不许用 DOM 标签。** `div` / `span` 写出来 H5 能跑、小程序渲染不出来。
+  一律 `import { View, Text } from '@tarojs/components'`。
+  `svg` / `br` / `button` 小程序都不支持 ——
+  示意图用绝对定位的 `View` 方块画（见 `FirstRun.tsx` 的 `Placement`），
+  换行拆成两个 `View`，按钮用 `Primitives.tsx` 的 `PixelButton`。
+- **不许用 Pointer Events。** 小程序只有 touch，按下态走
+  `onTouchStart` / `onTouchEnd` / `onTouchCancel`。
+- **不许直接摸 `window` / `document` / `localStorage` / `performance`。**
+  小程序全都没有。时钟用 `platform/env.ts` 的 `now()`，
+  存档走 `storage/SaveRepository.ts`（内部是 `Taro.getStorageSync`），
+  定时器用裸 `setTimeout` / `setInterval`，别写 `window.` 前缀。
+- 样式继续写 inline style 的数字（= CSS px）。
+  `config/index.ts` 里 `designWidth: 375`，让 `.css` 文件里的 px
+  和 inline style 的 px 换算一致，两端排版对得上。
+
+小程序特有的坑，已经处理但别退回去：
+
+- **加速度计单位是 g，不是 m/s²。** `WeappSensorAdapter` 里乘了 `9.80665`
+  才和 `DeviceMotion` 对齐。去掉这一步模长差 9.8 倍，所有阈值全废。
+  真机自查：编译模式选「传感器标定」，战斗页顶部 `|a|` 静止时应在 9.8 附近。
+- **轴向符号可能和 W3C 不一致**，`WeappSensorAdapter` 顶部的 `AXIS` 常量
+  就是留给标定的，别硬编码进公式。但注意它现在**不影响计数** ——
+  两个状态机吃的都是 `magnitude(ax, ay, az)`，模长与符号无关。
+  等 Phase 2 接 ONNX 吃 6 通道原始数据时才会要紧。
+- **息屏 / 切后台会挂起小程序，传感器回调直接断。**
+  训练开始必须 `keepScreenOn(true)`，结束和卸载都要还原。
+- 像素字体不能用 `@font-face` 引外链，只能 `Taro.loadFontFace`，
+  且域名要先加进小程序后台的 downloadFile 白名单。见 `platform/font.ts`。
 
 ---
 
 ## 5. 隐私：原始 IMU 不出设备
 
-- **原始 IMU 不落盘、不上传、不进 localStorage。** 只存动作结果
+- **原始 IMU 不落盘、不上传、不进本地存储。** 只存动作结果
   （`{ exercise, reps, duration, quality }`）。
 - 要做数据采集训练模型，必须单独走用户明确同意，不能混进正常训练流程。
-- `storage/SaveRepository.ts` 是唯一的持久化入口，别在组件里直接摸 `localStorage`。
+- `storage/SaveRepository.ts` 是唯一的持久化入口，
+  别在组件里直接摸 `localStorage` 或 `Taro.setStorageSync`。
 
 ---
 
@@ -153,6 +196,7 @@ app/       → 把它们粘起来（store + useTraining）
 - 点击目标不低于 44px
 - 角色和场景一律用 8×8 像素占位图（`PixelSprite`），
   **禁止 CSS 手绘角色或写复杂 SVG 插画**，等美术替换
+  （小程序也不支持 `svg` 标签，这条现在是双重约束）
 - 底部导航 4 项封顶，选中态是金色 + 深色底，不用下划线/圆点
 
 ---
@@ -196,10 +240,21 @@ app/       → 把它们粘起来（store + useTraining）
 
 ## 9. 环境
 
-- Windows 11 / Node 22 / npm 10
-- Vite 5 + React 18 + TypeScript 5（strict）
-- 手机调试必须 https（`npm run dev:https` 或 `startup.bat phone`），
+- Windows 11 / Node 22+ / npm 10+
+- Taro 4.2 + Vite 4 + React 18 + TypeScript 5（strict）
+- **Vite 必须锁在 4.x**：`@tarojs/vite-runner@4.2.1` 的 peer 是 `vite@^4`，
+  升到 5 会 ERESOLVE 装不上
+- 小程序调试：`startup.bat weapp` 起 watch 编译 → 微信开发者工具导入本目录
+  （`project.config.json` 的 `miniprogramRoot` 指向 `dist/weapp/`）。
+  开发者工具的模拟器**没有加速度计**，用编译模式「mock 传感器」（`mock=1`）跑链路，
+  真机预览才有真实 IMU
+- H5 手机调试必须 https（`startup.bat phone`，即 `HTTPS=1 npm run dev:h5`），
   DeviceMotion 要安全上下文，局域网 http 拿不到传感器
-- 桌面没有 IMU，用 `?mock=1` 走 `MockSensorAdapter` 的合成波形
-- iOS 的 `requestPermission()` **必须在用户手势里调**，
-  别挪到 `useEffect` 顶层或页面加载时
+- 桌面没有 IMU，`startup.bat` 直接开 `http://localhost:10086/?mock=1`
+  走 `MockSensorAdapter` 的合成波形
+- iOS Safari 的 `requestPermission()` **必须在用户手势里调**，
+  别挪到 `useEffect` 顶层或页面加载时（小程序没这个限制，但代码是同一份）
+- `config/index.ts` 里 `mini.postcss.url` 是**故意关掉的**：
+  vite-runner 按 `'url'` 这个名字 resolve，会命中 npm 的 `url` polyfill 包
+  而不是 `postcss-url`，每次构建报 `TypeError: require(...) is not a function`。
+  项目没有图片资源所以不需要它；将来真加了图，先 `npm i -D postcss-url` 再打开

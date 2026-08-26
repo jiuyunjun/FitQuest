@@ -1,3 +1,4 @@
+import { now } from '../platform/env'
 import type { PermissionState, SensorAdapter, SensorSample } from './SensorAdapter'
 
 type MotionEventCtor = typeof DeviceMotionEvent & {
@@ -36,7 +37,7 @@ export class BrowserSensorAdapter implements SensorAdapter {
       if (!acc) return
       const rot = e.rotationRate
       onSample({
-        timestamp: performance.now(),
+        timestamp: now(),
         ax: acc.x ?? 0,
         ay: acc.y ?? 0,
         az: acc.z ?? 0,

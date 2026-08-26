@@ -1,3 +1,4 @@
+import { View, Text } from '@tarojs/components'
 import { EXERCISES } from '../../exercise'
 import type { ExerciseId } from '../../exercise/types'
 import { repsToKill } from '../../game/DamageCalculator'
@@ -24,25 +25,25 @@ export function Home({
   const lowHp = boss.hp > 0 && boss.hp / boss.maxHp <= 0.2
 
   return (
-    <div style={{ padding: '20px 18px 28px', display: 'grid', gap: 18, alignContent: 'start' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ font: `400 11px/1 ${F.pixel}`, color: C.gold }}>DAY {streak + (today.result === 'none' ? 1 : 0)}</div>
-        <div style={{ font: `400 9px/1 ${F.pixel}`, color: C.muted }}>LV {level}</div>
-      </div>
+    <View style={{ padding: '20px 18px 28px', display: 'grid', gap: 18, alignContent: 'start' }}>
+      <View style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <View style={{ font: `400 11px/1 ${F.pixel}`, color: C.gold }}>DAY {streak + (today.result === 'none' ? 1 : 0)}</View>
+        <View style={{ font: `400 9px/1 ${F.pixel}`, color: C.muted }}>LV {level}</View>
+      </View>
 
       <Panel accent={C.border} style={{ justifyItems: 'center', gap: 12, padding: '18px 14px' }}>
         <Label>{defeated ? '今日 BOSS · 已击败' : '今日 BOSS'}</Label>
         <PixelSprite def={boss.def} cell={10} hidden={defeated} />
-        <div style={{ font: `900 17px/1.3 ${F.sans}`, color: C.text }}>{boss.def.name}</div>
-        <div style={{ width: '100%' }}>
+        <View style={{ font: `900 17px/1.3 ${F.sans}`, color: C.text }}>{boss.def.name}</View>
+        <View style={{ width: '100%' }}>
           <SegmentedBar value={boss.hp} max={boss.maxHp} color={lowHp ? C.red : '#c9634f'} height={14} blink={lowHp} />
-        </div>
-        <div style={{ font: `700 11px/1 ${F.mono}`, color: C.text }}>
+        </View>
+        <View style={{ font: `700 11px/1 ${F.mono}`, color: C.text }}>
           HP {boss.hp} / {boss.maxHp}
-        </div>
-        <div style={{ font: `400 11px/1.6 ${F.mono}`, color: C.muted }}>
+        </View>
+        <View style={{ font: `400 11px/1.6 ${F.mono}`, color: C.muted }}>
           弱点 {boss.def.weakLabel} · 伤害 ×1.5
-        </div>
+        </View>
       </Panel>
 
       <Panel>
@@ -58,16 +59,16 @@ export function Home({
       {!defeated && (
         <Panel accent={C.gold}>
           <Label color={C.gold}>推荐</Label>
-          <div style={{ font: `700 15px/1.5 ${F.sans}`, color: C.text }}>
+          <View style={{ font: `700 15px/1.5 ${F.sans}`, color: C.text }}>
             再完成 {Number.isFinite(need) ? need : '—'} 个{def.name}
-          </div>
-          <div style={{ font: `400 12px/1.6 ${F.mono}`, color: C.muted }}>
+          </View>
+          <View style={{ font: `400 12px/1.6 ${F.mono}`, color: C.muted }}>
             预计伤害 {boss.hp} · 可击杀
-          </div>
+          </View>
         </Panel>
       )}
 
-      <div style={{ display: 'grid', gap: 10 }}>
+      <View style={{ display: 'grid', gap: 10 }}>
         <Label>选择攻击方式 · 目标固定，方式自由</Label>
         {(Object.values(EXERCISES)).map((e) => {
           const on = e.id === exercise
@@ -89,32 +90,32 @@ export function Home({
                 textAlign: 'left',
               }}
             >
-              <div style={{ display: 'grid', gap: 5 }}>
-                <span style={{ font: `700 14px/1 ${F.sans}`, color: on ? C.gold : C.text }}>
+              <View style={{ display: 'grid', gap: 5 }}>
+                <Text style={{ font: `700 14px/1 ${F.sans}`, color: on ? C.gold : C.text }}>
                   {e.name}
                   {boss.def.weak === e.id ? ' · 弱点' : ''}
-                </span>
-                <span style={{ font: `400 11px/1 ${F.mono}`, color: C.muted }}>
+                </Text>
+                <Text style={{ font: `400 11px/1 ${F.mono}`, color: C.muted }}>
                   {e.supported ? `${e.baseDamage} DMG / 次` : '仅手动计数'}
-                </span>
-              </div>
-              <span style={{ font: `400 9px/1 ${F.pixel}`, color: on ? C.gold : C.dim }}>
+                </Text>
+              </View>
+              <Text style={{ font: `400 9px/1 ${F.pixel}`, color: on ? C.gold : C.dim }}>
                 {on ? '已选' : '选择'}
-              </span>
+              </Text>
             </button>
           )
         })}
-      </div>
+      </View>
 
       {today.result === 'none' && streak > 0 && (
         <Panel accent={C.goldDeep}>
-          <div style={{ font: `900 16px/1.5 ${F.sans}`, color: C.text }}>今天还没有行动</div>
-          <div style={{ font: `400 13px/1.8 ${F.sans}`, color: C.body }}>
+          <View style={{ font: `900 16px/1.5 ${F.sans}`, color: C.text }}>今天还没有行动</View>
+          <View style={{ font: `400 13px/1.8 ${F.sans}`, color: C.body }}>
             连续冒险 {streak} 天。完成最低任务（{MINIMAL_QUEST_MINUTES} 分钟）即可保住记录，奖励减少但不清零。
-          </div>
-          <div style={{ font: `400 11px/1 ${F.mono}`, color: C.muted }}>
+          </View>
+          <View style={{ font: `400 11px/1 ${F.mono}`, color: C.muted }}>
             本周剩 {Math.max(0, MINIMAL_QUEST_WEEKLY_LIMIT - minimalUsed)} 次
-          </div>
+          </View>
         </Panel>
       )}
 
@@ -122,18 +123,18 @@ export function Home({
         {defeated ? '继续训练' : '开始战斗'}
       </PixelButton>
 
-      <div style={{ font: `400 12px/1.7 ${F.sans}`, color: C.label, textAlign: 'center' }}>
+      <View style={{ font: `400 12px/1.7 ${F.sans}`, color: C.label, textAlign: 'center' }}>
         {def.hint}
-      </div>
-    </div>
+      </View>
+    </View>
   )
 }
 
 function StatRow({ label, done }: { label: string; done: boolean }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-      <span style={{ font: `400 13px/1.5 ${F.sans}`, color: done ? C.text : C.muted }}>{label}</span>
-      <span style={{ color: done ? C.green : C.dim }}>{done ? '✓' : '—'}</span>
-    </div>
+    <View style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+      <Text style={{ font: `400 13px/1.5 ${F.sans}`, color: done ? C.text : C.muted }}>{label}</Text>
+      <Text style={{ color: done ? C.green : C.dim }}>{done ? '✓' : '—'}</Text>
+    </View>
   )
 }

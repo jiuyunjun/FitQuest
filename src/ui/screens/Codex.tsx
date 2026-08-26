@@ -1,3 +1,4 @@
+import { View, Text } from '@tarojs/components'
 import { useGame } from '../../app/store'
 import { MONSTERS } from '../../game/monsters'
 import { PixelSprite } from '../components/PixelSprite'
@@ -8,8 +9,8 @@ export function Codex() {
   const found = new Set(state.defeatedBossIds)
 
   return (
-    <div style={{ display: 'grid', gridTemplateRows: 'auto 1fr', height: '100%' }}>
-      <div
+    <View style={{ display: 'grid', gridTemplateRows: 'auto 1fr', height: '100%' }}>
+      <View
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -19,13 +20,13 @@ export function Codex() {
           background: C.raised,
         }}
       >
-        <span style={{ font: `400 10px/1 ${F.pixel}`, color: C.gold }}>图鉴</span>
-        <span style={{ font: `400 9px/1 ${F.pixel}`, color: C.muted }}>
+        <Text style={{ font: `400 10px/1 ${F.pixel}`, color: C.gold }}>图鉴</Text>
+        <Text style={{ font: `400 9px/1 ${F.pixel}`, color: C.muted }}>
           {found.size} / {MONSTERS.length}
-        </span>
-      </div>
+        </Text>
+      </View>
 
-      <div
+      <View
         style={{
           padding: 18,
           overflowY: 'auto',
@@ -38,7 +39,7 @@ export function Codex() {
         {MONSTERS.map((m) => {
           const known = found.has(m.id)
           return (
-            <div
+            <View
               key={m.id}
               style={{
                 border: `3px solid ${known ? C.border : C.line}`,
@@ -50,7 +51,7 @@ export function Codex() {
               }}
             >
               <PixelSprite def={m} cell={7} hidden={!known} />
-              <div
+              <View
                 style={{
                   font: `700 12px/1.3 ${F.sans}`,
                   color: known ? C.text : C.dim,
@@ -58,19 +59,19 @@ export function Codex() {
                 }}
               >
                 {known ? m.name : '未发现'}
-              </div>
-              <div style={{ font: `400 8px/1 ${F.pixel}`, color: C.label }}>
+              </View>
+              <View style={{ font: `400 8px/1 ${F.pixel}`, color: C.label }}>
                 {known ? '已击败' : '???'}
-              </div>
+              </View>
               {known && (
-                <div style={{ font: `400 11px/1.5 ${F.sans}`, color: C.muted, textAlign: 'center' }}>
-                  弱点 <span style={{ color: C.green }}>{m.weakLabel}</span>
-                </div>
+                <View style={{ font: `400 11px/1.5 ${F.sans}`, color: C.muted, textAlign: 'center' }}>
+                  弱点 <Text style={{ color: C.green }}>{m.weakLabel}</Text>
+                </View>
               )}
-            </div>
+            </View>
           )
         })}
-      </div>
-    </div>
+      </View>
+    </View>
   )
 }

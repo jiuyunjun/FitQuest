@@ -1,7 +1,7 @@
 import type { SensorSample } from '../sensor/SensorAdapter'
 import { LowPass, RunningMean, magnitude } from '../signal/filter'
 import { scoreRep } from './quality'
-import type { ExerciseId, RepDetector, RepEvent } from './types'
+import type { DetectorDebug, ExerciseId, RepDetector, RepEvent } from './types'
 
 type State = 'STANDING' | 'DESCENDING' | 'BOTTOM' | 'ASCENDING'
 
@@ -27,6 +27,8 @@ export class SquatStateMachine implements RepDetector {
   private jitterCount = 0
   private d1 = 0
   private d2 = 0
+  private lastSmooth = 0
+  private lastDepth = 0
 
   /** 进入下蹲判定的偏移阈值 m/s²，低于基线。 */
   private readonly enterDepth = 1.6
@@ -42,6 +44,7 @@ export class SquatStateMachine implements RepDetector {
   push(s: SensorSample): RepEvent | null {
     const m = magnitude(s.ax, s.ay, s.az)
     const smooth = this.lp.push(m)
+    this.lastSmooth = smooth
 
     if (this.state === 'STANDING') {
       this.baseline.push(smooth)
@@ -50,6 +53,7 @@ export class SquatStateMachine implements RepDetector {
 
     const deviation = smooth - this.baseline.value
     const depth = -deviation
+    this.lastDepth = depth
 
     // 二阶差分：只惩罚高频抖动，动作本身的匀速位移不算不稳。
     this.jitterSum += Math.abs(deviation - 2 * this.d1 + this.d2)
@@ -145,11 +149,23 @@ export class SquatStateMachine implements RepDetector {
     return this.state
   }
 
+  get debug(): DetectorDebug {
+    return {
+      smooth: this.lastSmooth,
+      baseline: this.baseline.value,
+      value: this.lastDepth,
+      enter: this.enterDepth,
+      confirm: this.bottomDepth,
+    }
+  }
+
   reset(): void {
     this.lp.reset()
     this.baseline.reset()
     this.state = 'STANDING'
     this.repIndex = 0
+    this.lastSmooth = 0
+    this.lastDepth = 0
     this.reseg()
   }
 }

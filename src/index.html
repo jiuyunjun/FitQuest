@@ -10,7 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div id="app"></div>
+    <!-- Taro 的 h5 插件靠替换下面这行字面量注入 rem 适配脚本和应用入口。
+         删掉它 H5 会构建出一个没有任何 JS 的空 index.html。 -->
+    <script><%= htmlWebpackPlugin.options.script %></script>
   </body>
 </html>

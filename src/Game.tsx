@@ -1,3 +1,4 @@
+import { View } from '@tarojs/components'
 import { useState } from 'react'
 import { useGame } from './app/store'
 import type { ExerciseId } from './exercise/types'
@@ -13,7 +14,7 @@ import { C } from './ui/tokens'
 
 type Route = 'home' | 'battle' | 'victory'
 
-export function App() {
+export function Game() {
   const { state, markOnboarded, clearLastResult } = useGame()
   const [tab, setTab] = useState<Tab>('adventure')
   const [route, setRoute] = useState<Route>('home')
@@ -55,25 +56,25 @@ export function App() {
 
   return (
     <Shell>
-      <div style={{ display: 'grid', gridTemplateRows: '1fr auto', height: '100%', minHeight: 0 }}>
-        <div style={{ overflowY: 'auto', minHeight: 0 }}>
+      <View style={{ display: 'grid', gridTemplateRows: '1fr auto', height: '100%', minHeight: 0 }}>
+        <View style={{ overflowY: 'auto', minHeight: 0 }}>
           {tab === 'adventure' && (
             <Home exercise={exercise} onPickExercise={setExercise} onStart={() => setRoute('battle')} />
           )}
           {tab === 'character' && <Character />}
           {tab === 'codex' && <Codex />}
           {tab === 'data' && <Data />}
-        </div>
+        </View>
         <BottomNav active={tab} onChange={setTab} />
-      </div>
+      </View>
     </Shell>
   )
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ height: '100%', display: 'grid', placeItems: 'center', background: C.bg }}>
-      <div
+    <View style={{ height: '100%', display: 'grid', placeItems: 'center', background: C.bg }}>
+      <View
         style={{
           width: '100%',
           maxWidth: 430,
@@ -87,7 +88,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         }}
       >
         {children}
-      </div>
-    </div>
+      </View>
+    </View>
   )
 }

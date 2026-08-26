@@ -1,4 +1,10 @@
 node_modules
 dist
+
+# 指向旧仓库名 FigQuest 的残留检出，不是本项目的一部分
+/FigQuest
 scripts/.repcheck.mjs
 scripts/.smoke.mjs
+.temp
+.swc
+project.private.config.json

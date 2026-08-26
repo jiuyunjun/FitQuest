@@ -14,7 +14,8 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "types": ["@tarojs/taro", "@tarojs/components", "node"]
   },
-  "include": ["src"]
+  "include": ["src", "config", "scripts"]
 }

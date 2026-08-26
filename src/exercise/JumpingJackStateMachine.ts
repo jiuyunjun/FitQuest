@@ -1,7 +1,7 @@
 import type { SensorSample } from '../sensor/SensorAdapter'
 import { LowPass, RunningMean, magnitude } from '../signal/filter'
 import { scoreRep } from './quality'
-import type { ExerciseId, RepDetector, RepEvent } from './types'
+import type { DetectorDebug, ExerciseId, RepDetector, RepEvent } from './types'
 
 type State = 'CLOSED' | 'OPENING' | 'OPEN'
 
@@ -23,6 +23,8 @@ export class JumpingJackStateMachine implements RepDetector {
   private jitterCount = 0
   private d1 = 0
   private d2 = 0
+  private lastSmooth = 0
+  private lastDeviation = 0
 
   private readonly peakThreshold = 3.0
   private readonly releaseThreshold = 1.2
@@ -34,10 +36,12 @@ export class JumpingJackStateMachine implements RepDetector {
 
   push(s: SensorSample): RepEvent | null {
     const smooth = this.lp.push(magnitude(s.ax, s.ay, s.az))
+    this.lastSmooth = smooth
     if (this.state === 'CLOSED') this.baseline.push(smooth)
     if (!this.baseline.ready) return null
 
     const deviation = Math.abs(smooth - this.baseline.value)
+    this.lastDeviation = deviation
     this.jitterSum += Math.abs(deviation - 2 * this.d1 + this.d2)
     this.jitterCount++
     this.d2 = this.d1
@@ -98,6 +102,17 @@ export class JumpingJackStateMachine implements RepDetector {
     return this.state
   }
 
+  get debug(): DetectorDebug {
+    return {
+      smooth: this.lastSmooth,
+      baseline: this.baseline.value,
+      value: this.lastDeviation,
+      // 开合跳靠峰值分段：先顶过 peakThreshold 起判，再落回 releaseThreshold 才算一次。
+      enter: this.peakThreshold,
+      confirm: this.releaseThreshold,
+    }
+  }
+
   reset(): void {
     this.lp.reset()
     this.baseline.reset()
@@ -105,5 +120,7 @@ export class JumpingJackStateMachine implements RepDetector {
     this.repIndex = 0
     this.peak = 0
     this.lastRepAt = 0
+    this.lastSmooth = 0
+    this.lastDeviation = 0
   }
 }

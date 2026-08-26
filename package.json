@@ -2,26 +2,54 @@
   "name": "fitquest",
   "private": true,
   "version": "0.1.0",
-  "type": "module",
+  "description": "把现实运动变成游戏操作",
+  "templateInfo": {
+    "name": "default",
+    "typescript": true,
+    "css": "none",
+    "framework": "React"
+  },
+  "browserslist": [
+    "last 3 versions",
+    "Android >= 4.1",
+    "ios >= 8"
+  ],
   "scripts": {
-    "dev": "vite --host",
-    "dev:https": "vite --host --mode https",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview --host",
+    "dev": "npm run dev:h5",
+    "dev:h5": "taro build --type h5 --watch",
+    "dev:weapp": "taro build --type weapp --watch",
+    "build:h5": "taro build --type h5",
+    "build:weapp": "taro build --type weapp",
+    "build": "npm run build:weapp && npm run build:h5",
     "check": "tsc --noEmit && npm run repcheck && npm run smoke",
     "repcheck": "esbuild scripts/repcheck.ts --bundle --platform=node --format=esm --outfile=scripts/.repcheck.mjs && node scripts/.repcheck.mjs",
-    "smoke": "esbuild scripts/smoke.tsx --bundle --platform=node --format=esm --outfile=scripts/.smoke.mjs --jsx=automatic --inject:scripts/.smoke-env.js && node scripts/.smoke.mjs"
+    "smoke": "esbuild scripts/smoke.tsx --bundle --platform=node --format=esm --outfile=scripts/.smoke.mjs --jsx=automatic --alias:@tarojs/components=./scripts/shim/components.tsx --alias:@tarojs/taro=./scripts/shim/taro.ts --define:process.env.TARO_ENV=\"'h5'\" && node scripts/.smoke.mjs"
   },
   "dependencies": {
+    "@babel/runtime": "^7.24.4",
+    "@tarojs/components": "4.2.1",
+    "@tarojs/helper": "4.2.1",
+    "@tarojs/plugin-framework-react": "4.2.1",
+    "@tarojs/plugin-platform-h5": "4.2.1",
+    "@tarojs/plugin-platform-weapp": "4.2.1",
+    "@tarojs/react": "4.2.1",
+    "@tarojs/runtime": "4.2.1",
+    "@tarojs/shared": "4.2.1",
+    "@tarojs/taro": "4.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@tarojs/cli": "4.2.1",
+    "@tarojs/vite-runner": "4.2.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-basic-ssl": "^1.2.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "babel-preset-taro": "4.2.1",
+    "esbuild": "^0.21.5",
+    "postcss": "^8.4.47",
+    "terser": "^5.36.0",
     "typescript": "^5.6.3",
-    "vite": "^5.4.11"
+    "vite": "^4.5.5"
   }
 }

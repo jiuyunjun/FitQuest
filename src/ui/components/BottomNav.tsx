@@ -1,3 +1,4 @@
+import { View, Text } from '@tarojs/components'
 import { C, F } from '../tokens'
 
 export type Tab = 'adventure' | 'character' | 'codex' | 'data'
@@ -12,7 +13,7 @@ const TABS: { id: Tab; label: string }[] = [
 /** 4 项上限。选中项：金色 + 深色底，不用下划线或圆点。 */
 export function BottomNav({ active, onChange }: { active: Tab; onChange: (t: Tab) => void }) {
   return (
-    <div
+    <View
       style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
@@ -24,9 +25,8 @@ export function BottomNav({ active, onChange }: { active: Tab; onChange: (t: Tab
       {TABS.map((t) => {
         const on = t.id === active
         return (
-          <button
+          <View
             key={t.id}
-            type="button"
             onClick={() => onChange(t.id)}
             style={{
               display: 'grid',
@@ -35,15 +35,14 @@ export function BottomNav({ active, onChange }: { active: Tab; onChange: (t: Tab
               padding: '14px 4px',
               minHeight: 56,
               background: on ? C.line : 'transparent',
-              border: 'none',
-              cursor: 'pointer',
+              boxSizing: 'border-box',
             }}
           >
-            <div style={{ width: 14, height: 14, background: on ? C.gold : C.dim }} />
-            <span style={{ font: `400 8px/1 ${F.pixel}`, color: on ? C.gold : C.muted }}>{t.label}</span>
-          </button>
+            <View style={{ width: 14, height: 14, background: on ? C.gold : C.dim }} />
+            <Text style={{ font: `400 8px/1 ${F.pixel}`, color: on ? C.gold : C.muted }}>{t.label}</Text>
+          </View>
         )
       })}
-    </div>
+    </View>
   )
 }

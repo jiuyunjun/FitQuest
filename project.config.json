@@ -1,0 +1,40 @@
+{
+  "miniprogramRoot": "dist/weapp/",
+  "projectname": "FitQuest",
+  "description": "把现实运动变成游戏操作",
+  "appid": "wx7f137ba907c64fe7",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "enhance": false,
+    "postcss": false,
+    "minified": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "compileType": "miniprogram",
+  "simulatorType": "wechat",
+  "simulatorPluginLibVersion": {},
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "mock 传感器（模拟器无 IMU 时用）",
+          "pathName": "pages/index/index",
+          "query": "mock=1",
+          "scene": null
+        },
+        {
+          "name": "传感器标定（真机看原始 ax/ay/az）",
+          "pathName": "pages/index/index",
+          "query": "debug=1",
+          "scene": null
+        }
+      ]
+    }
+  },
+  "isGameTourist": false
+}

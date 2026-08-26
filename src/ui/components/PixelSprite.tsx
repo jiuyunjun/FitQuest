@@ -1,3 +1,4 @@
+import { View } from '@tarojs/components'
 import { spriteCells } from '../../game/monsters'
 
 /** 8×8 像素占位精灵。最终资源由美术替换，禁止 CSS 绘制角色。 */
@@ -14,7 +15,7 @@ export function PixelSprite({
 }) {
   const cells = spriteCells(def)
   return (
-    <div
+    <View
       style={{
         display: 'grid',
         gridTemplateColumns: `repeat(8, ${cell}px)`,
@@ -27,7 +28,7 @@ export function PixelSprite({
       }}
     >
       {cells.map((color, i) => (
-        <div
+        <View
           key={i}
           style={{
             width: cell,
@@ -36,6 +37,6 @@ export function PixelSprite({
           }}
         />
       ))}
-    </div>
+    </View>
   )
 }

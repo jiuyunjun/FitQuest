@@ -6,6 +6,17 @@ UI 完全按 Claude Design 的「FitQuest 设计系统」实现：8-bit RPG，�
 
 ## 跑起来
 
+Windows 直接双击 `startup.bat`（首次会自动装依赖，然后开浏览器）：
+
+```
+startup.bat          桌面调试，自动打开 ?mock=1
+startup.bat phone    手机调试，https + 局域网
+startup.bat build    生产构建
+startup.bat check    类型检查 + 计数验证 + 渲染冒烟
+```
+
+或者直接用 npm：
+
 ```bash
 npm install
 npm run dev          # 桌面调试

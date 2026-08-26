@@ -1,0 +1,4 @@
+node_modules
+dist
+scripts/.repcheck.mjs
+scripts/.smoke.mjs

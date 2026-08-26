@@ -1,0 +1,26 @@
+{
+  "name": "fitquest",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host",
+    "dev:https": "vite --host --mode https",
+    "repcheck": "esbuild scripts/repcheck.ts --bundle --platform=node --format=esm --outfile=scripts/.repcheck.mjs && node scripts/.repcheck.mjs",
+    "smoke": "esbuild scripts/smoke.tsx --bundle --platform=node --format=esm --outfile=scripts/.smoke.mjs --jsx=automatic --inject:scripts/.smoke-env.js && node scripts/.smoke.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-basic-ssl": "^1.2.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}
